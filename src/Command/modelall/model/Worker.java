@@ -103,6 +103,12 @@ public class Worker implements Comparable<Worker> {
         return new Worker(name, coordinates, salary, position, status, person);
     }
 
-    public Object toCsv() {
+
+    /** Метод нужен серверу, чтобы отдать Worker клиенту. */
+    public String toCsv() {
+        // Уже существует полноценный toCSV() – просто проксируем,
+        // чтобы не переписывать весь код.
+        return this.toCSV();
     }
+
 }

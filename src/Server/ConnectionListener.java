@@ -16,8 +16,8 @@ public class ConnectionListener {
     private static final int BUF  = 64 * 1024;
 
     private final CollectionManager cm;
-    private final CommandDispatcher dispatcher = new CommandDispatcher(
-            new CommandHandler(new WorkerService(null /*не нужен*/), null));
+    private final CommandDispatcher dispatcher =
+            new CommandDispatcher(new CommandHandler(new WorkerService(null), null));
     private final ResponseSender sender = new ResponseSender();
 
     public ConnectionListener(CollectionManager cm) { this.cm = cm; }

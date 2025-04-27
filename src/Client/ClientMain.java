@@ -15,7 +15,7 @@ public class ClientMain {
              var conn = new Connection(host, port)) {
 
             var console = new ConsoleReader(sc);
-            var builder = new WorkerBuilder(sc);
+            var builder = new WorkerBuilder();
 
             while (true) {
                 String line = console.readLine();

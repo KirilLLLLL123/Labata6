@@ -6,8 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="labara6" />
         <module name="rabotyganazavode" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rabotyganazavode" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

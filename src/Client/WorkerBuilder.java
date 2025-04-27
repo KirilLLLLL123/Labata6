@@ -1,17 +1,16 @@
 package Client;
 
+import Command.modelall.input.InputManager;
 import Command.modelall.model.Worker;
 import Command.modelall.commands.WorkerCreator;
-
-import java.util.Scanner;
 
 /** Интерактивное построение Worker, переиспользует WorkerCreator из команд. */
 public final class WorkerBuilder {
 
-    private final WorkerCreator creator;
+    private final InputManager input = new InputManager();   // читает из System.in
 
-    public WorkerBuilder(Scanner sc) { this.creator = new WorkerCreator(sc); }
-
-    public Worker build() throws Exception { return creator.build(); }
+    /** Создаём готовый Worker, все вопросы задаёт WorkerCreator. */
+    public Worker build() throws Exception {
+        return WorkerCreator.createWorker(input);
+    }
 }
-
