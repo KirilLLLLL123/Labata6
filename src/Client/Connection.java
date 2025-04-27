@@ -13,41 +13,34 @@ import java.util.List;
 public class Connection implements AutoCloseable {
 
     private static final int BUF = 64 * 1024;
-    private final InetSocketAddress addr;
-    private SocketChannel channel;
-    private final ByteBuffer buf = ByteBuffer.allocate(BUF);
+
+    private final SocketChannel channel;
+    private final ByteBuffer    byteBuf = ByteBuffer.allocate(BUF);
 
     public Connection(String host, int port) throws Exception {
-        this.addr = new InetSocketAddress(host, port);
-        reconnect();
+        channel = SocketChannel.open(new InetSocketAddress(host, port));
+        channel.configureBlocking(true);                 // блокирующий режим
     }
 
-    private void reconnect() throws Exception {
-        if (channel != null && channel.isOpen()) channel.close();
-        channel = SocketChannel.open(addr);
-        channel.configureBlocking(true);     // клиенту проще блокирующий
-    }
+    /* ---------------- публичный метод ---------------- */
 
     public Response request(Request r) throws Exception {
-        try {
-            writeLine(r.toFirstLine());
-            if (r.workerCsv() != null) writeLine(r.workerCsv());
-            writeLine("END");
+        /* ----- отправка ----- */
+        writeLine(r.toFirstLine());
+        if (r.workerCsv() != null) writeLine(r.workerCsv());
+        writeLine("END");
 
-            List<String> lines = new ArrayList<>();
-            while (true) {
-                String line = readLine();
-                if ("END".equals(line)) break;
-                lines.add(line);
-            }
-            return Response.fromLines(lines);
-        } catch (Exception e) {              // сервер мог «упасть» → переподключаемся
-            reconnect();
-            throw e;
+        /* ----- приём ----- */
+        List<String> lines = new ArrayList<>();
+        while (true) {
+            String ln = readLine();
+            if ("END".equals(ln)) break;
+            lines.add(ln);
         }
+        return Response.fromLines(lines);
     }
 
-    /* ------------ helpers ------------ */
+    /* ---------------- util ---------------- */
 
     private void writeLine(String s) throws Exception {
         byte[] bytes = (s + "\r\n").getBytes(StandardCharsets.UTF_8);
@@ -55,24 +48,37 @@ public class Connection implements AutoCloseable {
         while (out.hasRemaining()) channel.write(out);
     }
 
+    /** корректно читает UTF-8 строку, пока не встретит \n */
     private String readLine() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        ByteBuffer one = ByteBuffer.allocate(1);
+        ByteBuffer lineBuf = ByteBuffer.allocate(1024);
+
         while (true) {
-            one.clear();
-            int r = channel.read(one);
-            if (r == -1) throw new java.io.EOFException();
-            one.flip();
-            char c = (char) one.get();
-            if (c == '\n') {
-                if (sb.length()>0 && sb.charAt(sb.length()-1)=='\r')
-                    sb.setLength(sb.length()-1);
-                return sb.toString();
+            int read = channel.read(byteBuf);
+            if (read == -1) throw new java.io.EOFException();
+
+            byteBuf.flip();
+            while (byteBuf.hasRemaining()) {
+                byte b = byteBuf.get();
+                if (b == '\n') {                       // конец строки
+                    int len = lineBuf.position();
+                    if (len > 0 && lineBuf.get(len - 1) == '\r') len--;
+                    byte[] arr = new byte[len];
+                    lineBuf.flip();
+                    lineBuf.get(arr);
+                    byteBuf.compact();                 // готовим buf к следующему чтению
+                    return new String(arr, StandardCharsets.UTF_8);
+                } else {
+                    if (!lineBuf.hasRemaining()) {     // расширяем буфер при необходимости
+                        ByteBuffer bigger = ByteBuffer.allocate(lineBuf.capacity() * 2);
+                        lineBuf.flip(); bigger.put(lineBuf); lineBuf.clear(); lineBuf.put(bigger);
+                        lineBuf = bigger;
+                    }
+                    lineBuf.put(b);
+                }
             }
-            sb.append(c);
+            byteBuf.clear();
         }
     }
 
     @Override public void close() throws Exception { channel.close(); }
 }
-
