@@ -1,26 +1,22 @@
 package Server;
-/** ждёт TCP-клиента */
 
-import Command.modelall.commands.CommandHandler;
-import Command.modelall.service.WorkerService;
+import Command.modelall.Request;
+import Command.modelall.Response;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
+import java.util.List;
 
-/** Главный цикл сервера, один поток, неблокирующий NIO. */
+/** Один поток, неблокирующий NIO. */
 public class ConnectionListener {
 
     private static final int PORT = 5555;
     private static final int BUF  = 64 * 1024;
 
-    private final CollectionManager cm;
-    private final CommandDispatcher dispatcher =
-            new CommandDispatcher(new CommandHandler(new WorkerService(null), null));
-    private final ResponseSender sender = new ResponseSender();
-
-    public ConnectionListener(CollectionManager cm) { this.cm = cm; }
+    private final CommandDispatcher dispatcher = new CommandDispatcher();
+    private final ResponseSender    sender     = new ResponseSender();
 
     public void start() throws Exception {
         try (ServerSocketChannel server = ServerSocketChannel.open()) {
@@ -31,29 +27,40 @@ public class ConnectionListener {
             server.register(sel, SelectionKey.OP_ACCEPT);
 
             ByteBuffer buf = ByteBuffer.allocate(BUF);
-            System.out.println("TCP-сервер на порту " + PORT);
+            System.out.println("TCP-сервер слушает порт " + PORT);
 
             while (true) {
                 sel.select();
                 Iterator<SelectionKey> it = sel.selectedKeys().iterator();
+
                 while (it.hasNext()) {
                     SelectionKey key = it.next(); it.remove();
 
-                    if (key.isAcceptable()) {
+                    if (key.isAcceptable()) {                    // подключение
                         SocketChannel ch = server.accept();
                         ch.configureBlocking(false);
                         ch.register(sel, SelectionKey.OP_READ,
                                 new RequestReader());
-                    } else if (key.isReadable()) {
-                        SocketChannel ch = (SocketChannel) key.channel();
-                        RequestReader rr = (RequestReader) key.attachment();
-                        var req = rr.read(ch, buf);
-                        if (req == null) continue;          // не дочитали
-                        rr.reset();
+                    }
 
-                        var resp = dispatcher.dispatch(req);
-                        sender.send(ch, resp);
-                        ch.close();
+                    else if (key.isReadable()) {                 // запрос
+                        SocketChannel ch  = (SocketChannel) key.channel();
+                        RequestReader rr  = (RequestReader)  key.attachment();
+
+                        try {
+                            Request req = rr.read(ch, buf);      // может вернуть null
+                            if (req == null) continue;
+
+                            rr.reset();
+                            Response resp = dispatcher.dispatch(req);
+                            sender.send(ch, resp);               // OK-ответ
+                        } catch (Exception ex) {
+                            // Любая ошибка -> ERROR-ответ
+                            sender.send(ch, new Response(false,
+                                    ex.getMessage(), List.of()));
+                        } finally {
+                            ch.close();                          // «1 команда = 1 сокет»
+                        }
                     }
                 }
             }

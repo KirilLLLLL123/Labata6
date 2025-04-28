@@ -1,22 +1,24 @@
 package Server;
-/** выполняет команду */
 
 import Command.modelall.Request;
 import Command.modelall.Response;
-import Command.modelall.commands.CommandHandler;
 
 import java.util.List;
 
-/** SERVER-side: пока просто подтверждаем получение команды. */
+/**
+ * Простая заглушка: подтверждает получение любой команды.
+ */
 public class CommandDispatcher {
 
-    public CommandDispatcher(CommandHandler commandHandler) {
-    }
-
     public Response dispatch(Request req) {
-        // TODO: заменить на настоящую обработку команд, когда будете готовы
-        String msg = "Команда \"" + req.command() + "\" получена";
-        return new Response(true, msg, List.of());
+        StringBuilder sb = new StringBuilder("Команда «")
+                .append(req.command()).append('»');
+
+        if (req.argument() != null && !req.argument().isBlank())
+            sb.append(" (").append(req.argument()).append(')');
+        if (req.workerCsv() != null)
+            sb.append(" + WorkerCSV");
+
+        return new Response(true, sb.toString(), List.of());
     }
 }
-
