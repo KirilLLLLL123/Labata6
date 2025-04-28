@@ -1,5 +1,6 @@
 package Command.modelall;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +9,8 @@ import java.util.List;
  * 2-я (необязательно) :  worker-CSV
  * END                 :  маркер конца
  */
-public class Request {
+public class Request implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final String command;      // имя команды
     private final String argument;     // «простой» аргумент или null
     private final String workerCsv;    // строка Worker или null

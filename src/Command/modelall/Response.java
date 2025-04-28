@@ -1,6 +1,7 @@
 package Command.modelall;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
  * далее       :  payload-lines
  * END         :  маркер конца
  */
-public class Response {
+public class Response implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public final boolean ok;
     public final String  message;      // читается в ClientMain

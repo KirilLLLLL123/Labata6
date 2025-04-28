@@ -38,7 +38,7 @@ public class ClientMain {
                 System.out.println(resp.message);
                 resp.payload.forEach(System.out::println);
             } catch (Exception e) {
-                System.err.println("CLIENT: " + e.getMessage());
+                e.printStackTrace();             // временно, чтобы увидеть, ЧТО падает
             }
         }
     }
