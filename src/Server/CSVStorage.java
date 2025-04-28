@@ -3,10 +3,8 @@ package Server;
 
 import Command.modelall.model.Worker;
 import Command.modelall.storage.CsvWorkerStorage;
-
 import java.util.*;
 
-/** Тонкая оболочка над CsvWorkerStorage из 5-й лабы. */
 public final class CSVStorage {
 
     private final CsvWorkerStorage storage;
@@ -15,7 +13,7 @@ public final class CSVStorage {
         this.storage = new CsvWorkerStorage(file);
     }
 
-    /** Загружаем из файла и кладём в TreeMap< Integer, Worker > (ключ = id). */
+    /** Загружаем из файла и кладём в TreeMap */
     public Map<Integer, Worker> load() throws Exception {
         List<Worker> list = storage.loadWorkers();
         Map<Integer, Worker> map = new TreeMap<>();
@@ -25,7 +23,7 @@ public final class CSVStorage {
         return map;
     }
 
-    /** Сохраняем всю коллекцию обратно в CSV. */
+    /** Сохраняем всю коллекцию обратно в CSV */
     public void save(Map<Integer, Worker> map) throws Exception {
         storage.saveWorkers(map.values());
     }

@@ -29,7 +29,7 @@ public class ConnectionListener {
 
                 } catch (Exception e) {                     // любое исключение → ERROR
                     new ObjectOutputStream(
-                            ss.accept().getOutputStream())     // на всякий случай
+                            ss.accept().getOutputStream())
                             .writeObject(new Response(false, e.getMessage(), List.of()));
                 }
             }

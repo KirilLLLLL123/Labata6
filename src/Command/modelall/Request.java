@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Объект-запрос, который Клиент шлёт Серверу.<br>
+ * Объект-запрос, который Клиент шлёт Серверу
  * 1-я строка протокола:  command,argument
- * 2-я (необязательно) :  worker-CSV
- * END                 :  маркер конца
+ * 2-я:  worker-CSV
+ * END:  маркер конца
  */
 public class Request implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -21,18 +21,18 @@ public class Request implements Serializable {
         this.workerCsv = workerCsv;
     }
 
-    /* ---------- getters, которые используют Client/Server ---------- */
+
     public String command()      { return command; }
     public String argument()     { return argument; }
     public String workerCsv()    { return workerCsv; }
 
-    /* ---------- кодирование ---------- */
+    /* кодирование */
     public String toFirstLine() {
         return CSVUtil.toCsvLine(List.of(command,
                 argument == null ? "" : argument));
     }
 
-    /* ---------- декодирование ---------- */
+    /* декодирование */
     public static Request fromLines(List<String> lines) {
         if (lines.isEmpty())
             throw new IllegalArgumentException("Пустой запрос");

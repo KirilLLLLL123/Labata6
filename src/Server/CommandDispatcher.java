@@ -5,9 +5,7 @@ import Command.modelall.Response;
 
 import java.util.List;
 
-/**
- * Простая заглушка: подтверждает получение любой команды.
- */
+/** Простая заглушка: подтверждает получение любой команды */
 public class CommandDispatcher {
 
     public Response dispatch(Request req) {

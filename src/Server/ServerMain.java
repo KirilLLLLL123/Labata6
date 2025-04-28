@@ -5,7 +5,7 @@ import java.io.File;
 
 public class ServerMain {
     public static void main(String[] args) {
-        String file = "workers.csv";                      // можно заменить на args[0]
+        String file = "workers.csv";
 
         try {
             // если файла нет — создаём пустой

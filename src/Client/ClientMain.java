@@ -13,7 +13,7 @@ public class ClientMain {
 
         var scanner = new Scanner(System.in);
         var console = new ConsoleReader(scanner);
-        var builder = new WorkerBuilder();          // ⬅ WorkerBuilder без аргументов
+        var builder = new WorkerBuilder();
 
         while (true) {
             String line = console.readLine();

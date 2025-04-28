@@ -13,7 +13,7 @@ public class CollectionManager {
 
     public CollectionManager(CSVStorage storage) { this.storage = storage; }
 
-    /* ------------ file I/O ------------ */
+
 
     public void load() throws Exception {
         workers.clear();
@@ -22,7 +22,6 @@ public class CollectionManager {
 
     public void save() throws Exception { storage.save(workers); }
 
-    /* ------------ business ------------ */
 
     public Map<Integer, Worker> view() {       // не отдаём исходную map
         return new TreeMap<>(workers);         // автоматическая сортировка

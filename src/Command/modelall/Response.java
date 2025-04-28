@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Ответ, который Сервер шлёт Клиенту.
- *
+ * Ответ, который Сервер шлёт Клиенту
  * 1-я строка:  OK|ERROR,<message>
  * 2-я строка:  <count payload-lines>
- * далее       :  payload-lines
- * END         :  маркер конца
+ * далее:  payload-lines
+ * END:  маркер конца
  */
 public class Response implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -26,7 +25,7 @@ public class Response implements Serializable {
         this.payload = payload == null ? List.of() : List.copyOf(payload);
     }
 
-    /* ---------- кодирование ---------- */
+    /* кодирование */
     public List<String> toLines() {
         List<String> lines = new ArrayList<>();
         lines.add(CSVUtil.toCsvLine(List.of(ok ? "OK" : "ERROR", message)));
@@ -35,7 +34,7 @@ public class Response implements Serializable {
         return lines;
     }
 
-    /* ---------- декодирование ---------- */
+    /* декодирование */
     public static Response fromLines(List<String> lines) {
         if (lines.size() < 2)
             throw new IllegalArgumentException("Сломанный ответ сервера");
