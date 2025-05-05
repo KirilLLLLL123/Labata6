@@ -23,6 +23,8 @@ public class CsvWorkerStorage implements WorkerStorage {
             }
         } catch (IOException e) {
             throw new CSVFormatException("Ошибка чтения файла: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return workers;
     }

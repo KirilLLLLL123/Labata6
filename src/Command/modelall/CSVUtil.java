@@ -11,10 +11,7 @@ public final class CSVUtil {
     private CSVUtil() {}
 
 
-    public static String toLines(List<Worker> list) {
-        return list.stream().map(Worker::toCsv)
-                .collect(Collectors.joining("\n"));
-    }
+
 
     /*вспомогательные методы для сетевого протокола */
 

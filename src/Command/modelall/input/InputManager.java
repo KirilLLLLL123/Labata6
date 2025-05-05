@@ -150,4 +150,8 @@ public class InputManager {
             }
         }
     }
+
+    public Scanner getScanner() {
+        return scanner;
+    }
 }

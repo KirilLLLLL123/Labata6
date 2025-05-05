@@ -25,7 +25,7 @@ public class ServerMain {
                 try { cm.save(); } catch (Exception ignored) {}
             }));
 
-            new ConnectionListener().start();          // старт сервера
+            new ConnectionListener(cm).start();          // старт сервера
         } catch (Exception e) {
             System.err.println("SERVER: " + e.getMessage());
         }
